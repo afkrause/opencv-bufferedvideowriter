@@ -1,5 +1,6 @@
 import cv2
 import threading,queue,time
+import os
 
 class BufferedVideoWriter:
     def __init__(self,filename,fourcc,fps,frameSize,maxBufferSize=25):
@@ -10,12 +11,15 @@ class BufferedVideoWriter:
         self.maxBufferSize=maxBufferSize
         self.frameSize=frameSize
         self.filename=filename
+        self.filename_ts = os.path.splitext(filename)[0] + "_timestamps.txt" # filename for saving timestamps
     def start(self):
         if self.thread:
             return
         dt=1./self.fps
+        
         def loop():
             writer=cv2.VideoWriter(filename=self.filename,fourcc=self.fourcc,fps=self.fps,frameSize=self.frameSize)
+            timestamps = []
             t=time.time()
             self.queue.put((cv2.rectangle(self.frameSize, (0, 0), self.frameSize, (0, 0, 0), -1),t))
             while self.thread or self.queue.qsize():
@@ -24,10 +28,19 @@ class BufferedVideoWriter:
                     break
                 while t<ts:
                     writer.write(frame)
+                    timestamps.append(ts)
                     t+=dt
             writer.release()
+            # save timestamps
+            # https://www.geeksforgeeks.org/python/reading-and-writing-lists-to-a-file-in-python/
+            with open(self.filename_ts, 'w') as f:
+                tmp = list(map(str, timestamps))
+                tmp = '\n'.join(tmp) # add new - lines
+                f.writelines(tmp)
+            
         self.thread=threading.Thread(target=loop)
         self.thread.start()
+        
     def stop(self):
         if not self.thread:
             return
