@@ -28,15 +28,12 @@ class BufferedVideoWriter:
                     break
                 while t<ts:
                     writer.write(frame)
-                    timestamps.append(ts)
+                    timestamps.append(str(ts) + '\n')
                     t+=dt
             writer.release()
             # save timestamps
-            # https://www.geeksforgeeks.org/python/reading-and-writing-lists-to-a-file-in-python/
             with open(self.filename_ts, 'w') as f:
-                tmp = list(map(str, timestamps))
-                tmp = '\n'.join(tmp) # add new - lines
-                f.writelines(tmp)
+                f.writelines(timestamps)
             
         self.thread=threading.Thread(target=loop)
         self.thread.start()
