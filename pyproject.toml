@@ -3,7 +3,7 @@ name = "opencv-bufferedvideowriter"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12.11"
+requires-python = ">=3.8"
 dependencies = [
-    "opencv-python>=4.13.0.92",
+    "opencv-python>=4.0",
 ]
